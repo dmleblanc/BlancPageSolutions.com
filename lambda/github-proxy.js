@@ -70,8 +70,13 @@ exports.handler = async (event) => {
                 variables: { username }
             });
         } else if (endpoint === 'events' || endpoint === 'commits') {
+            // Get optional includeRepos parameter
+            const includeRepos = event.queryStringParameters?.includeRepos 
+                ? event.queryStringParameters.includeRepos.split(',') 
+                : null;
+            
             // Serve recent commits from DynamoDB
-            const commits = await getRecentCommits(username);
+            const commits = await getRecentCommits(username, includeRepos);
             return {
                 statusCode: 200,
                 headers: {
@@ -186,7 +191,7 @@ async function getGitHubInstallationToken() {
     }
 }
 
-async function getRecentCommits(username) {
+async function getRecentCommits(username, includeRepos = null) {
     try {
         // For now, scan with filter - in production you'd add a GSI
         // This is acceptable for personal portfolio with limited data
@@ -204,8 +209,18 @@ async function getRecentCommits(username) {
 
         const result = await dynamodb.scan(scanParams).promise();
         
+        // Filter by included repositories if specified
+        let filteredCommits = result.Items;
+        if (includeRepos && includeRepos.length > 0) {
+            filteredCommits = result.Items.filter(commit => {
+                // Extract repo name from full path (e.g., "dmleblanc/BlancPageSolutions.com" -> "BlancPageSolutions.com")
+                const repoName = commit.repo.includes('/') ? commit.repo.split('/').pop() : commit.repo;
+                return includeRepos.includes(repoName) || includeRepos.includes(commit.repo);
+            });
+        }
+        
         // Sort by timestamp descending and take the most recent 10
-        const sortedCommits = result.Items
+        const sortedCommits = filteredCommits
             .sort((a, b) => b.timestamp - a.timestamp)
             .slice(0, 10);
 

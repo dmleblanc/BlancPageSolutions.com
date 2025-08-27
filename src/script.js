@@ -214,7 +214,13 @@ async function loadRecentCommits(githubConfig) {
     
     try {
         // Use the new commits endpoint for real-time data
-        const apiUrl = `${githubConfig.apiEndpoint}?username=${githubConfig.username}&endpoint=commits`;
+        let apiUrl = `${githubConfig.apiEndpoint}?username=${githubConfig.username}&endpoint=commits`;
+        
+        // Add includeRepos parameter if specified
+        if (githubConfig.includeRepos && githubConfig.includeRepos.length > 0) {
+            apiUrl += `&includeRepos=${githubConfig.includeRepos.join(',')}`;
+        }
+        
         const response = await fetch(apiUrl);
         const events = await response.json();
         

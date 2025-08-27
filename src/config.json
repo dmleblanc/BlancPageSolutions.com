@@ -67,7 +67,7 @@
     "showContributions": true,
     "showRecentCommits": true,
     "maxCommits": 10,
-    "excludeRepos": [],
+    "includeRepos": ["BlancPageSolutions.com"],
     "apiEndpoint": "https://ldfxyzoosi.execute-api.us-east-1.amazonaws.com/prod/github"
   },
   "contact": {
