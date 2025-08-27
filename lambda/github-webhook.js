@@ -5,25 +5,41 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 const secretsManager = new AWS.SecretsManager();
 
 exports.handler = async (event) => {
-    console.log('Webhook event received:', JSON.stringify(event, null, 2));
+    console.log('🚀 Webhook event received!');
+    console.log('Event headers:', JSON.stringify(event.headers, null, 2));
+    console.log('Event body (first 500 chars):', event.body?.substring(0, 500));
+    console.log('Full event:', JSON.stringify(event, null, 2));
 
     try {
         // Parse the incoming webhook payload
         const payload = JSON.parse(event.body || '{}');
         const headers = event.headers || {};
 
+        console.log('📦 Parsed payload keys:', Object.keys(payload));
+        console.log('🔍 GitHub event type:', headers['x-github-event']);
+        console.log('🔐 Signature present:', !!headers['x-hub-signature-256']);
+
         // Verify GitHub webhook signature (optional but recommended)
         const githubSignature = headers['x-hub-signature-256'];
         if (githubSignature && !await verifyWebhookSignature(event.body, githubSignature)) {
+            console.log('❌ Signature verification failed');
             return {
                 statusCode: 401,
                 body: JSON.stringify({ error: 'Invalid signature' })
             };
+        } else if (githubSignature) {
+            console.log('✅ Signature verified successfully');
+        } else {
+            console.log('⚠️ No signature provided - skipping verification');
         }
 
         // Handle push events
         if (headers['x-github-event'] === 'push') {
+            console.log('🔄 Processing push event...');
             await handlePushEvent(payload);
+            console.log('✅ Push event processed successfully');
+        } else {
+            console.log(`ℹ️ Ignoring non-push event: ${headers['x-github-event']}`);
         }
 
         return {
@@ -32,7 +48,8 @@ exports.handler = async (event) => {
         };
 
     } catch (error) {
-        console.error('Webhook processing error:', error);
+        console.error('❌ Webhook processing error:', error);
+        console.error('Error stack:', error.stack);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: 'Internal server error' })
@@ -45,7 +62,12 @@ async function handlePushEvent(payload) {
     const repoName = repository.full_name;
     
     console.log(`Processing ${commits.length} commits for ${repoName}`);
-    console.log('First commit data structure:', JSON.stringify(commits[0], null, 2));
+    console.log('Repository data:', JSON.stringify(repository, null, 2));
+    console.log('All commits data:', JSON.stringify(commits, null, 2));
+    console.log('Environment variables:', {
+        COMMITS_TABLE: process.env.COMMITS_TABLE,
+        GITHUB_APP_CREDENTIALS_SECRET: process.env.GITHUB_APP_CREDENTIALS_SECRET
+    });
 
     // Store each commit in DynamoDB
     for (let i = 0; i < commits.length; i++) {
@@ -67,15 +89,24 @@ async function handlePushEvent(payload) {
             modified: commit.modified || []
         };
 
+        console.log(`[COMMIT ${i + 1}/${commits.length}] About to write commit data:`, JSON.stringify(commitData, null, 2));
+        console.log(`[COMMIT ${i + 1}/${commits.length}] DynamoDB put parameters:`, {
+            TableName: process.env.COMMITS_TABLE,
+            ItemKeys: Object.keys(commitData)
+        });
+        
         try {
-            await dynamodb.put({
+            const putResult = await dynamodb.put({
                 TableName: process.env.COMMITS_TABLE,
                 Item: commitData
             }).promise();
             
-            console.log(`Stored commit: ${commit.id.substring(0, 7)} - ${commit.message.substring(0, 50)}...`);
+            console.log(`[COMMIT ${i + 1}/${commits.length}] ✅ Successfully stored commit: ${commit.id.substring(0, 7)} - ${commit.message.substring(0, 50)}...`);
+            console.log(`[COMMIT ${i + 1}/${commits.length}] DynamoDB put result:`, JSON.stringify(putResult, null, 2));
         } catch (error) {
-            console.error(`Error storing commit ${commit.id}:`, error);
+            console.error(`[COMMIT ${i + 1}/${commits.length}] ❌ Error storing commit ${commit.id}:`, error);
+            console.error(`[COMMIT ${i + 1}/${commits.length}] Full error details:`, JSON.stringify(error, null, 2));
+            console.error(`[COMMIT ${i + 1}/${commits.length}] Error stack:`, error.stack);
         }
     }
 }
