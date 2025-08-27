@@ -114,40 +114,45 @@ async function handlePushEvent(payload) {
         console.log(`[COMMIT ${i + 1}/${commits.length}] About to write commit data:`, JSON.stringify(commitData, null, 2));
         console.log(`[COMMIT ${i + 1}/${commits.length}] DynamoDB put parameters:`, {
             TableName: process.env.COMMITS_TABLE,
-            ItemKeys: Object.keys(commitData)
+            ItemKeys: Object.keys(commitData),
+            KeyValidation: {
+                repo: typeof commitData.repo,
+                timestamp: typeof commitData.timestamp,
+                repoValue: commitData.repo,
+                timestampValue: commitData.timestamp
+            }
         });
         
+        // Validate required DynamoDB key fields before attempting write
+        if (!commitData.repo || !commitData.timestamp) {
+            console.error(`[COMMIT ${i + 1}/${commits.length}] ❌ Missing required key fields - repo: ${commitData.repo}, timestamp: ${commitData.timestamp}`);
+            continue;
+        }
+        
         try {
+            console.log(`[COMMIT ${i + 1}/${commits.length}] 🚀 Starting DynamoDB put operation...`);
             const putResult = await dynamodb.put({
                 TableName: process.env.COMMITS_TABLE,
                 Item: commitData
             }).promise();
             
-            console.log(`[COMMIT ${i + 1}/${commits.length}] ✅ Successfully stored commit: ${commit.id.substring(0, 7)} - ${commit.message.substring(0, 50)}...`);
+            console.log(`[COMMIT ${i + 1}/${commits.length}] ✅ DynamoDB put operation completed successfully!`);
+            console.log(`[COMMIT ${i + 1}/${commits.length}] Commit stored: ${commit.id.substring(0, 7)} - ${commit.message.substring(0, 50)}...`);
             console.log(`[COMMIT ${i + 1}/${commits.length}] DynamoDB put result:`, JSON.stringify(putResult, null, 2));
             
-            // Immediately try to read back the item to verify it was actually written
-            console.log(`[COMMIT ${i + 1}/${commits.length}] 🔍 Attempting to read back the item to verify...`);
-            try {
-                const getResult = await dynamodb.get({
-                    TableName: process.env.COMMITS_TABLE,
-                    Key: {
-                        repo: commitData.repo,
-                        timestamp: commitData.timestamp
-                    }
-                }).promise();
-                
-                if (getResult.Item) {
-                    console.log(`[COMMIT ${i + 1}/${commits.length}] ✅ Verification successful - item found in DynamoDB`);
-                } else {
-                    console.log(`[COMMIT ${i + 1}/${commits.length}] ❌ Verification failed - item not found in DynamoDB despite successful put`);
-                }
-            } catch (verifyError) {
-                console.error(`[COMMIT ${i + 1}/${commits.length}] ❌ Error verifying item:`, verifyError);
-            }
+            // Log the exact item that was written with its keys
+            console.log(`[COMMIT ${i + 1}/${commits.length}] Item written to DynamoDB:`, {
+                repo: commitData.repo,
+                timestamp: commitData.timestamp,
+                sha: commitData.sha,
+                message: commitData.message.substring(0, 50)
+            });
             
         } catch (error) {
-            console.error(`[COMMIT ${i + 1}/${commits.length}] ❌ Error storing commit ${commit.id}:`, error);
+            console.error(`[COMMIT ${i + 1}/${commits.length}] ❌ DynamoDB put operation failed!`);
+            console.error(`[COMMIT ${i + 1}/${commits.length}] Error storing commit ${commit.id}:`, error);
+            console.error(`[COMMIT ${i + 1}/${commits.length}] Error name:`, error.name);
+            console.error(`[COMMIT ${i + 1}/${commits.length}] Error message:`, error.message);
             console.error(`[COMMIT ${i + 1}/${commits.length}] Full error details:`, JSON.stringify(error, null, 2));
             console.error(`[COMMIT ${i + 1}/${commits.length}] Error stack:`, error.stack);
         }
