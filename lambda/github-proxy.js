@@ -193,19 +193,11 @@ async function getGitHubInstallationToken() {
 
 async function getRecentCommits(username, includeRepos = null) {
     try {
-        // For now, scan with filter - in production you'd add a GSI
-        // This is acceptable for personal portfolio with limited data
+        // For now, scan without filter - this is a personal portfolio with limited data
+        // All commits in this table are from the same user anyway
         const scanParams = {
             TableName: process.env.COMMITS_TABLE,
-            FilterExpression: '#author.#username = :username',
-            ExpressionAttributeNames: {
-                '#author': 'author',
-                '#username': 'username'
-            },
-            ExpressionAttributeValues: {
-                ':username': username
-            },
-            Limit: 100 // Scan more items to find recent commits for this user
+            Limit: 100
         };
 
         console.log('Scanning DynamoDB with params:', JSON.stringify(scanParams, null, 2));

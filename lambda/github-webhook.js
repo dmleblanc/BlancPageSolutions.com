@@ -45,6 +45,7 @@ async function handlePushEvent(payload) {
     const repoName = repository.full_name;
     
     console.log(`Processing ${commits.length} commits for ${repoName}`);
+    console.log('First commit data structure:', JSON.stringify(commits[0], null, 2));
 
     // Store each commit in DynamoDB
     for (let i = 0; i < commits.length; i++) {
@@ -58,7 +59,7 @@ async function handlePushEvent(payload) {
             author: {
                 name: commit.author.name,
                 email: commit.author.email,
-                username: commit.author.username || commit.committer.username
+                username: commit.author.username || commit.committer.username || extractUsernameFromEmail(commit.author.email) || 'unknown'
             },
             url: commit.url,
             added: commit.added || [],
@@ -77,6 +78,16 @@ async function handlePushEvent(payload) {
             console.error(`Error storing commit ${commit.id}:`, error);
         }
     }
+}
+
+function extractUsernameFromEmail(email) {
+    if (!email) return null;
+    // Handle GitHub noreply emails like "username@users.noreply.github.com"
+    if (email.includes('@users.noreply.github.com')) {
+        return email.split('@')[0];
+    }
+    // For other emails, use the part before @
+    return email.split('@')[0];
 }
 
 async function verifyWebhookSignature(payload, signature) {
