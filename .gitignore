@@ -12,3 +12,6 @@ keys/
 # Exclude OS files
 .DS_Store
 Thumbs.db
+# Exclude IDE files
+.idea/
+.vscode/
