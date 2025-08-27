@@ -197,9 +197,10 @@ async function getRecentCommits(username, includeRepos = null) {
         // This is acceptable for personal portfolio with limited data
         const scanParams = {
             TableName: process.env.COMMITS_TABLE,
-            FilterExpression: '#authorUsername = :username',
+            FilterExpression: '#author.#username = :username',
             ExpressionAttributeNames: {
-                '#authorUsername': 'author.username'
+                '#author': 'author',
+                '#username': 'username'
             },
             ExpressionAttributeValues: {
                 ':username': username
@@ -207,17 +208,25 @@ async function getRecentCommits(username, includeRepos = null) {
             Limit: 100 // Scan more items to find recent commits for this user
         };
 
+        console.log('Scanning DynamoDB with params:', JSON.stringify(scanParams, null, 2));
         const result = await dynamodb.scan(scanParams).promise();
+        console.log('DynamoDB scan result:', JSON.stringify({count: result.Count, scannedCount: result.ScannedCount}, null, 2));
         
         // Filter by included repositories if specified
         let filteredCommits = result.Items;
+        console.log('Before repo filtering - commits count:', filteredCommits.length);
+        console.log('includeRepos parameter:', includeRepos);
+        
         if (includeRepos && includeRepos.length > 0) {
             filteredCommits = result.Items.filter(commit => {
                 // Extract repo name from full path (e.g., "dmleblanc/BlancPageSolutions.com" -> "BlancPageSolutions.com")
                 const repoName = commit.repo.includes('/') ? commit.repo.split('/').pop() : commit.repo;
+                console.log('Checking repo:', commit.repo, '-> extracted:', repoName, 'against includeRepos:', includeRepos);
                 return includeRepos.includes(repoName) || includeRepos.includes(commit.repo);
             });
         }
+        
+        console.log('After repo filtering - commits count:', filteredCommits.length);
         
         // Sort by timestamp descending and take the most recent 10
         const sortedCommits = filteredCommits
