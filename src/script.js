@@ -333,10 +333,26 @@ function renderContributionCalendar(calendarData, container) {
         calendarHtml += '<div class="week">';
         week.contributionDays.forEach(day => {
             const level = getContributionLevel(day.contributionCount);
-            const date = new Date(day.date).toLocaleDateString();
+            const date = new Date(day.date);
+            const formattedDate = date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            let tooltipText;
+            if (day.contributionCount === 0) {
+                tooltipText = `No contributions on ${formattedDate}`;
+            } else if (day.contributionCount === 1) {
+                tooltipText = `1 contribution on ${formattedDate}`;
+            } else {
+                tooltipText = `${day.contributionCount} contributions on ${formattedDate}`;
+            }
+            
             calendarHtml += `
                 <div class="day contribution-${level}" 
-                     title="${day.contributionCount} contributions on ${date}"
+                     title="${tooltipText}"
                      data-count="${day.contributionCount}"
                      data-date="${day.date}">
                 </div>
