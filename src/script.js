@@ -339,7 +339,12 @@ function renderContributionCalendar(calendarData, container) {
         calendarHtml += '<div class="week">';
         week.contributionDays.forEach(day => {
             const level = getContributionLevel(day.contributionCount);
-            const date = new Date(day.date);
+            
+            // Parse date correctly to avoid timezone issues
+            // day.date is in format "YYYY-MM-DD"
+            const [year, month, dayNum] = day.date.split('-').map(Number);
+            const date = new Date(year, month - 1, dayNum); // month is 0-indexed
+            
             const formattedDate = date.toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -358,7 +363,7 @@ function renderContributionCalendar(calendarData, container) {
             
             calendarHtml += `
                 <div class="day contribution-${level}" 
-                     title="${tooltipText}"
+                     data-tooltip="${tooltipText}"
                      data-count="${day.contributionCount}"
                      data-date="${day.date}">
                 </div>
@@ -384,6 +389,11 @@ function renderContributionCalendar(calendarData, container) {
     `;
 
     container.innerHTML = calendarHtml;
+    
+    // Add custom tooltip functionality after DOM is ready
+    setTimeout(() => {
+        initializeTooltips(container);
+    }, 0);
 }
 
 function getContributionLevel(count) {
@@ -392,6 +402,75 @@ function getContributionLevel(count) {
     if (count <= 5) return 2;
     if (count <= 10) return 3;
     return 4;
+}
+
+function initializeTooltips(container) {
+    // Remove any existing tooltips first
+    const existingTooltip = document.querySelector('.tooltip');
+    if (existingTooltip) {
+        existingTooltip.remove();
+    }
+    
+    const tooltip = document.createElement('div');
+    tooltip.className = 'tooltip';
+    document.body.appendChild(tooltip);
+    
+    const dayElements = container.querySelectorAll('.day[data-tooltip]');
+    console.log('Found', dayElements.length, 'elements with data-tooltip'); // Debug log
+    
+    dayElements.forEach(dayElement => {
+        dayElement.addEventListener('mouseenter', (e) => {
+            const tooltipText = e.target.getAttribute('data-tooltip');
+            console.log('Tooltip hover:', tooltipText); // Debug log
+            
+            if (!tooltipText) return;
+            
+            tooltip.textContent = tooltipText;
+            tooltip.style.visibility = 'visible';
+            tooltip.classList.add('show');
+            
+            // Position tooltip above the element
+            const rect = e.target.getBoundingClientRect();
+            
+            // Set initial position to get accurate measurements
+            tooltip.style.left = '0px';
+            tooltip.style.top = '0px';
+            
+            const tooltipRect = tooltip.getBoundingClientRect();
+            
+            let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+            let top = rect.top - tooltipRect.height - 10;
+            
+            // Ensure tooltip doesn't go off screen horizontally
+            if (left < 8) {
+                left = 8;
+            } else if (left + tooltipRect.width > window.innerWidth - 8) {
+                left = window.innerWidth - tooltipRect.width - 8;
+            }
+            
+            // Ensure tooltip doesn't go off screen vertically
+            if (top < 8) {
+                top = rect.bottom + 10; // Show below instead
+            }
+            
+            tooltip.style.left = left + 'px';
+            tooltip.style.top = top + window.scrollY + 'px';
+        });
+        
+        dayElement.addEventListener('mouseleave', () => {
+            tooltip.classList.remove('show');
+            tooltip.style.visibility = 'hidden';
+        });
+    });
+    
+    // Clean up tooltip when it's hidden
+    tooltip.addEventListener('transitionend', () => {
+        if (!tooltip.classList.contains('show')) {
+            tooltip.style.left = '-9999px';
+            tooltip.style.top = '-9999px';
+            tooltip.style.visibility = 'hidden';
+        }
+    });
 }
 
 function populateProfile(profileConfig) {
