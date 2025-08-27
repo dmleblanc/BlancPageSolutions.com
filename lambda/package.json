@@ -1,0 +1,13 @@
+{
+  "name": "blancpage-github-proxy",
+  "version": "1.0.0",
+  "description": "GitHub API proxy Lambda for BlancPage Solutions",
+  "main": "github-proxy.js",
+  "dependencies": {
+    "aws-sdk": "^2.1490.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

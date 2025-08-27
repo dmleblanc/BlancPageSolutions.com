@@ -1,0 +1,140 @@
+{
+  "site": {
+    "name": "BlancPage Solutions",
+    "tagline": "Start fresh with innovative solutions tailored to your business needs",
+    "logo": "assets/icons/BlancPageLogo.png",
+    "favicon": "assets/icons/favicon.ico"
+  },
+  "company": {
+    "email": "info@blancpagesolutions.com",
+    "phone": "+1 (555) 123-4567",
+    "address": "123 Business Ave, Suite 100, City, State 12345",
+    "founded": "2024"
+  },
+  "navigation": [
+    {"label": "Home", "href": "#home"},
+    {"label": "About", "href": "#about"},
+    {"label": "Services", "href": "#services"},
+    {"label": "Contact", "href": "#contact"}
+  ],
+  "hero": {
+    "title": "Welcome to BlancPage Solutions",
+    "subtitle": "I help businesses unlock the power of their data with innovative BI and development solutions",
+    "ctaText": "Get In Touch",
+    "backgroundType": "gradient"
+  },
+  "about": {
+    "title": "About Me",
+    "description": "I believe every great achievement starts with a blank page. Through BlancPage Solutions, I help you write your success story with cutting-edge data and development solutions that drive real business value."
+  },
+  "profile": {
+    "title": "I'm Dave",
+    "name": "David LeBlanc",
+    "role": "BI Consultant @ Ironside",
+    "headshot": "assets/images/Headshot.jpeg",
+    "bio": "With over a decade of experience in technology and business intelligence, I specialize in transforming complex data into actionable insights. I'm passionate about helping businesses make data-driven decisions and building scalable solutions that drive growth.",
+    "linkedin": "https://linkedin.com/in/davidleblanc",
+    "email": "david@blancpagesolutions.com"
+  },
+  "services": [
+    {
+      "title": "Business Intelligence",
+      "description": "I design and implement BI solutions that transform raw data into strategic insights for better decision making",
+      "icon": "business-intelligence"
+    },
+    {
+      "title": "Data Engineering",
+      "description": "I build robust data pipelines and architectures that ensure your data is clean, accessible, and scalable",
+      "icon": "data-engineering"
+    },
+    {
+      "title": "Solution Architecture",
+      "description": "I design comprehensive technical solutions that align with your business goals and scale with your growth",
+      "icon": "solution-architecture"
+    },
+    {
+      "title": "Full Stack Development",
+      "description": "I develop end-to-end applications from database to user interface, delivering complete technical solutions",
+      "icon": "full-stack-development"
+    }
+  ],
+  "servicesSection": {
+    "title": "Core Competencies"
+  },
+  "github": {
+    "title": "Recent Activity",
+    "username": "dmleblanc",
+    "showContributions": true,
+    "showRecentCommits": true,
+    "maxCommits": 10,
+    "excludeRepos": [],
+    "apiEndpoint": "https://ldfxyzoosi.execute-api.us-east-1.amazonaws.com/prod/github"
+  },
+  "contact": {
+    "title": "Get In Touch",
+    "formFields": [
+      {"type": "text", "name": "name", "placeholder": "Your Name", "required": true},
+      {"type": "email", "name": "email", "placeholder": "Your Email", "required": true},
+      {"type": "textarea", "name": "message", "placeholder": "Your Message", "rows": 5, "required": true}
+    ],
+    "submitText": "Send Message",
+    "successMessage": "Thank you for your message! I'll get back to you soon."
+  },
+  "footer": {
+    "copyrightText": "© 2024 BlancPage Solutions. All rights reserved.",
+    "socialLinks": [
+      {"platform": "linkedin", "url": "https://linkedin.com/company/blancpagesolutions"},
+      {"platform": "twitter", "url": "https://twitter.com/blancpagesolutions"},
+      {"platform": "facebook", "url": "https://facebook.com/blancpagesolutions"}
+    ]
+  },
+  "theme": {
+    "palette": {
+      "primary": "#E62727",
+      "secondary": "#1e93ab", 
+      "neutral": "#dcdcdc",
+      "background": "#f3f2ec"
+    },
+    "colors": {
+      "primaryColor": "#E62727",
+      "primaryDark": "#cc2020",
+      "primaryLight": "#ff4040",
+      "secondaryColor": "#1e93ab",
+      "secondaryDark": "#166f82",
+      "secondaryLight": "#2bb5d4",
+      "textDark": "#2c2c2c",
+      "textLight": "#666666",
+      "backgroundPrimary": "#f3f2ec",
+      "backgroundSecondary": "#ffffff",
+      "backgroundNeutral": "#dcdcdc",
+      "borderLight": "#dcdcdc",
+      "white": "#ffffff",
+      "black": "#000000"
+    },
+    "fonts": {
+      "imports": [
+        "https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      ],
+      "brand": {
+        "name": "Amsterdam Four",
+        "fallback": "serif",
+        "source": "local"
+      },
+      "heading": {
+        "name": "Montserrat",
+        "weight": "600",
+        "fallback": "sans-serif"
+      },
+      "body": {
+        "name": "Montserrat",
+        "weight": "400",
+        "fallback": "sans-serif"
+      },
+      "button": {
+        "name": "Montserrat",
+        "weight": "500",
+        "fallback": "sans-serif"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+# Exclude compiled code dirs
+lambda/node_modules
+
+# Exclude Lambda deployment package
+lambda/lambda-deployment.zip
+
+# Exclude keys
+keys/
+
+# Exclude app YAML
+*.yaml
