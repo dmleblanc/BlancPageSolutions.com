@@ -16,11 +16,14 @@ exports.handler = async (event) => {
         const headers = event.headers || {};
 
         console.log('📦 Parsed payload keys:', Object.keys(payload));
-        console.log('🔍 GitHub event type:', headers['x-github-event']);
-        console.log('🔐 Signature present:', !!headers['x-hub-signature-256']);
+        // GitHub headers are case-sensitive
+        const githubEvent = headers['X-GitHub-Event'];
+        const githubSignature = headers['X-Hub-Signature-256'];
+        
+        console.log('🔍 GitHub event type:', githubEvent);
+        console.log('🔐 Signature present:', !!githubSignature);
 
         // Verify GitHub webhook signature (optional but recommended)
-        const githubSignature = headers['x-hub-signature-256'];
         if (githubSignature && !await verifyWebhookSignature(event.body, githubSignature)) {
             console.log('❌ Signature verification failed');
             return {
@@ -34,12 +37,12 @@ exports.handler = async (event) => {
         }
 
         // Handle push events
-        if (headers['x-github-event'] === 'push') {
+        if (githubEvent === 'push') {
             console.log('🔄 Processing push event...');
             await handlePushEvent(payload);
             console.log('✅ Push event processed successfully');
         } else {
-            console.log(`ℹ️ Ignoring non-push event: ${headers['x-github-event']}`);
+            console.log(`ℹ️ Ignoring non-push event: ${githubEvent}`);
         }
 
         return {
