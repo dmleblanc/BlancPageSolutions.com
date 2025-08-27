@@ -72,6 +72,25 @@ async function handlePushEvent(payload) {
         GITHUB_APP_CREDENTIALS_SECRET: process.env.GITHUB_APP_CREDENTIALS_SECRET
     });
 
+    // First, let's check if we can describe the table to understand its structure
+    try {
+        console.log('🔍 Checking DynamoDB table structure...');
+        const tableInfo = await dynamodb.scan({
+            TableName: process.env.COMMITS_TABLE,
+            Limit: 1
+        }).promise();
+        
+        console.log('📊 Current table item count:', tableInfo.Count);
+        console.log('📊 Scanned count:', tableInfo.ScannedCount);
+        if (tableInfo.Items && tableInfo.Items.length > 0) {
+            console.log('📊 Sample existing item:', JSON.stringify(tableInfo.Items[0], null, 2));
+        } else {
+            console.log('📊 No existing items in table');
+        }
+    } catch (tableError) {
+        console.error('❌ Error checking table structure:', tableError);
+    }
+
     // Store each commit in DynamoDB
     for (let i = 0; i < commits.length; i++) {
         const commit = commits[i];
@@ -106,6 +125,27 @@ async function handlePushEvent(payload) {
             
             console.log(`[COMMIT ${i + 1}/${commits.length}] ✅ Successfully stored commit: ${commit.id.substring(0, 7)} - ${commit.message.substring(0, 50)}...`);
             console.log(`[COMMIT ${i + 1}/${commits.length}] DynamoDB put result:`, JSON.stringify(putResult, null, 2));
+            
+            // Immediately try to read back the item to verify it was actually written
+            console.log(`[COMMIT ${i + 1}/${commits.length}] 🔍 Attempting to read back the item to verify...`);
+            try {
+                const getResult = await dynamodb.get({
+                    TableName: process.env.COMMITS_TABLE,
+                    Key: {
+                        repo: commitData.repo,
+                        timestamp: commitData.timestamp
+                    }
+                }).promise();
+                
+                if (getResult.Item) {
+                    console.log(`[COMMIT ${i + 1}/${commits.length}] ✅ Verification successful - item found in DynamoDB`);
+                } else {
+                    console.log(`[COMMIT ${i + 1}/${commits.length}] ❌ Verification failed - item not found in DynamoDB despite successful put`);
+                }
+            } catch (verifyError) {
+                console.error(`[COMMIT ${i + 1}/${commits.length}] ❌ Error verifying item:`, verifyError);
+            }
+            
         } catch (error) {
             console.error(`[COMMIT ${i + 1}/${commits.length}] ❌ Error storing commit ${commit.id}:`, error);
             console.error(`[COMMIT ${i + 1}/${commits.length}] Full error details:`, JSON.stringify(error, null, 2));
