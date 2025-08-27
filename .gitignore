@@ -9,3 +9,6 @@ keys/
 
 # Exclude app YAML
 *.yaml
+# Exclude OS files
+.DS_Store
+Thumbs.db
