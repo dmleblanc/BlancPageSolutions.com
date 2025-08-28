@@ -125,18 +125,39 @@ function populateAbout(aboutConfig) {
     }
 }
 
+let activeServiceIndex = null;
+
 function populateServices(services, servicesSection) {
-    const servicesGrid = document.getElementById('services-grid');
+    const servicesList = document.getElementById('services-list');
     const servicesTitle = document.getElementById('services-title');
     
     if (servicesTitle && servicesSection) {
         servicesTitle.textContent = servicesSection.title;
     }
     
-    if (servicesGrid && services) {
-        services.forEach(service => {
+    if (servicesList && services) {
+        services.forEach((service, index) => {
             const serviceCard = document.createElement('div');
             serviceCard.className = 'service-card';
+            
+            // Create main service icon
+            if (service.icon) {
+                const iconContainer = document.createElement('div');
+                iconContainer.className = 'service-icon';
+                
+                if (service.iconType === 'fontawesome') {
+                    const icon = document.createElement('i');
+                    icon.className = `fas fa-${service.icon}`;
+                    iconContainer.appendChild(icon);
+                } else {
+                    // Handle other icon types (SVG files, etc.) in the future
+                    const icon = document.createElement('i');
+                    icon.className = `fas fa-${service.icon}`;
+                    iconContainer.appendChild(icon);
+                }
+                
+                serviceCard.appendChild(iconContainer);
+            }
             
             const title = document.createElement('h3');
             title.textContent = service.title;
@@ -144,11 +165,341 @@ function populateServices(services, servicesSection) {
             const description = document.createElement('p');
             description.textContent = service.description;
             
+            // Add title and description to card
             serviceCard.appendChild(title);
             serviceCard.appendChild(description);
-            servicesGrid.appendChild(serviceCard);
+            
+            // Create tool badges if tools are specified
+            if (service.tools && service.tools.length > 0) {
+                const toolBadges = document.createElement('div');
+                toolBadges.className = 'tool-badges';
+                
+                service.tools.forEach(tool => {
+                    const toolBadge = document.createElement('div');
+                    toolBadge.className = 'tool-badge';
+                    toolBadge.title = tool.charAt(0).toUpperCase() + tool.slice(1); // Tooltip
+                    
+                    const toolIcon = document.createElement('img');
+                    toolIcon.src = `assets/icons/tools/${tool}.svg`;
+                    toolIcon.alt = tool;
+                    toolIcon.onerror = function() {
+                        // Fallback if SVG doesn't exist
+                        this.style.display = 'none';
+                        const fallbackText = document.createElement('span');
+                        fallbackText.textContent = tool.charAt(0).toUpperCase();
+                        fallbackText.className = 'tool-fallback';
+                        this.parentNode.appendChild(fallbackText);
+                    };
+                    
+                    toolBadge.appendChild(toolIcon);
+                    toolBadges.appendChild(toolBadge);
+                });
+                
+                serviceCard.appendChild(toolBadges);
+            }
+            
+            // Add click handler for selection
+            serviceCard.addEventListener('click', () => {
+                handleServiceSelection(index, services);
+            });
+            
+            // Add keyboard navigation
+            serviceCard.tabIndex = 0;
+            serviceCard.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleServiceSelection(index, services);
+                }
+            });
+            
+            servicesList.appendChild(serviceCard);
         });
+        
+        // Auto-select first competency (Business Intelligence) by default
+        if (services && services.length > 0) {
+            setTimeout(() => {
+                handleServiceSelection(0, services);
+            }, 100);
+        }
     }
+}
+
+function handleServiceSelection(index, services) {
+    const serviceCards = document.querySelectorAll('.service-card');
+    const projectsPanel = document.getElementById('projects-panel');
+    const isMobile = window.innerWidth <= 768;
+    
+    // Toggle selection
+    if (activeServiceIndex === index) {
+        // Deselect current
+        serviceCards[index].classList.remove('active');
+        // Remove arrow indicator
+        const arrow = serviceCards[index].querySelector('.arrow-indicator');
+        if (arrow) arrow.remove();
+        activeServiceIndex = null;
+        
+        if (isMobile) {
+            // Hide mobile panel
+            const mobilePanel = serviceCards[index].nextElementSibling;
+            if (mobilePanel && mobilePanel.classList.contains('projects-panel')) {
+                mobilePanel.remove();
+            }
+        } else {
+            // Show default message
+            showNoSelectionMessage();
+        }
+    } else {
+        // Remove previous active state
+        if (activeServiceIndex !== null) {
+            serviceCards[activeServiceIndex].classList.remove('active');
+            // Remove arrow indicator from previous active card
+            const prevArrow = serviceCards[activeServiceIndex].querySelector('.arrow-indicator');
+            if (prevArrow) prevArrow.remove();
+            
+            if (isMobile) {
+                const prevMobilePanel = serviceCards[activeServiceIndex].nextElementSibling;
+                if (prevMobilePanel && prevMobilePanel.classList.contains('projects-panel')) {
+                    prevMobilePanel.remove();
+                }
+            }
+        }
+        
+        // Set new active
+        serviceCards[index].classList.add('active');
+        
+        // Add arrow indicator for desktop only
+        if (!isMobile) {
+            const arrowIndicator = document.createElement('div');
+            arrowIndicator.className = 'arrow-indicator';
+            serviceCards[index].appendChild(arrowIndicator);
+        }
+        
+        activeServiceIndex = index;
+        
+        if (isMobile) {
+            // Insert projects panel after the service card on mobile
+            const mobilePanelHtml = createMobileProjectsPanel(services[index]);
+            serviceCards[index].insertAdjacentHTML('afterend', mobilePanelHtml);
+        } else {
+            // Update desktop panel
+            renderProjectsPanel(services[index]);
+        }
+    }
+}
+
+function showNoSelectionMessage() {
+    const panelContent = document.querySelector('.projects-panel-content');
+    if (panelContent) {
+        panelContent.innerHTML = `
+            <div class="no-selection">
+                <p>Select a competency to view related projects</p>
+            </div>
+        `;
+    }
+}
+
+function renderProjectsPanel(service) {
+    const panelContent = document.querySelector('.projects-panel-content');
+    if (!panelContent || !service.projects) return;
+    
+    panelContent.innerHTML = '';
+    
+    // Create header
+    const header = document.createElement('div');
+    header.className = 'projects-panel-header';
+    
+    const title = document.createElement('h3');
+    title.className = 'projects-panel-title';
+    title.textContent = service.title;
+    header.appendChild(title);
+    
+    const subtitle = document.createElement('p');
+    subtitle.className = 'projects-panel-subtitle';
+    subtitle.textContent = `${service.projects.length} Featured Project${service.projects.length !== 1 ? 's' : ''}`;
+    header.appendChild(subtitle);
+    
+    panelContent.appendChild(header);
+    
+    // Create projects container
+    const projectsContainer = document.createElement('div');
+    projectsContainer.className = 'projects-container';
+    
+    // Add project cards
+    service.projects.forEach(project => {
+        const projectCard = createProjectCard(project);
+        projectsContainer.appendChild(projectCard);
+    });
+    
+    panelContent.appendChild(projectsContainer);
+}
+
+function createMobileProjectsPanel(service) {
+    if (!service.projects || service.projects.length === 0) return '';
+    
+    let projectsHtml = `
+        <div class="projects-panel mobile-visible">
+            <div class="projects-panel-content">
+                <div class="projects-panel-header">
+                    <h3 class="projects-panel-title">${service.title}</h3>
+                    <p class="projects-panel-subtitle">${service.projects.length} Featured Project${service.projects.length !== 1 ? 's' : ''}</p>
+                </div>
+                <div class="projects-container">
+    `;
+    
+    service.projects.forEach(project => {
+        const projectCard = createProjectCard(project);
+        // Convert DOM element to HTML string
+        const tempDiv = document.createElement('div');
+        tempDiv.appendChild(projectCard);
+        projectsHtml += tempDiv.innerHTML;
+    });
+    
+    projectsHtml += `
+                </div>
+            </div>
+        </div>
+    `;
+    
+    return projectsHtml;
+}
+
+function createProjectCard(project) {
+    const projectCard = document.createElement('div');
+    projectCard.className = 'project-card';
+
+    // Add Personal Project badge if applicable
+    if (project.isPersonal) {
+        const badge = document.createElement('span');
+        badge.className = 'personal-project-badge';
+        badge.textContent = 'Personal Project';
+        projectCard.appendChild(badge);
+    }
+
+    // Project header
+    const projectHeader = document.createElement('div');
+    projectHeader.className = 'project-header';
+
+    const projectTitle = document.createElement('h5');
+    projectTitle.className = 'project-title';
+    projectTitle.textContent = project.title;
+    projectHeader.appendChild(projectTitle);
+
+    // Project meta information
+    const projectMeta = document.createElement('div');
+    projectMeta.className = 'project-meta';
+
+    if (project.industry) {
+        const industryItem = createMetaItem('Industry', project.industry);
+        projectMeta.appendChild(industryItem);
+    }
+
+    if (project.timeframe) {
+        const timeframeItem = createMetaItem('Duration', project.timeframe);
+        projectMeta.appendChild(timeframeItem);
+    }
+
+    if (project.completionDate) {
+        const completionItem = createMetaItem('Completed', project.completionDate);
+        projectMeta.appendChild(completionItem);
+    }
+
+    projectHeader.appendChild(projectMeta);
+    projectCard.appendChild(projectHeader);
+
+    // Business context
+    if (project.businessContext) {
+        const contextDiv = document.createElement('div');
+        contextDiv.className = 'project-context';
+        contextDiv.textContent = project.businessContext;
+        projectCard.appendChild(contextDiv);
+    }
+
+    // Project outcome
+    if (project.outcome) {
+        const outcomeDiv = document.createElement('div');
+        outcomeDiv.className = 'project-outcome';
+        outcomeDiv.textContent = project.outcome;
+        projectCard.appendChild(outcomeDiv);
+    }
+
+    // Technology stack
+    if (project.techStack && project.techStack.length > 0) {
+        const techStackSection = document.createElement('div');
+        techStackSection.className = 'project-tech-stack';
+
+        const techTitle = document.createElement('div');
+        techTitle.className = 'project-tech-title';
+        techTitle.textContent = 'Technology Stack';
+        techStackSection.appendChild(techTitle);
+
+        const techBadges = document.createElement('div');
+        techBadges.className = 'project-tech-badges';
+
+        project.techStack.forEach(tech => {
+            const techBadge = document.createElement('div');
+            techBadge.className = 'project-tech-badge';
+            techBadge.title = tech.alt || tech.tool;
+
+            const techIcon = document.createElement('img');
+            techIcon.src = `assets/icons/tools/${tech.tool}.svg`;
+            techIcon.alt = tech.alt || tech.tool;
+            techIcon.onerror = function() {
+                // Fallback if SVG doesn't exist
+                this.style.display = 'none';
+                const fallbackText = document.createElement('span');
+                fallbackText.textContent = tech.tool.charAt(0).toUpperCase();
+                fallbackText.className = 'tool-fallback';
+                this.parentNode.appendChild(fallbackText);
+            };
+
+            techBadge.appendChild(techIcon);
+            techBadges.appendChild(techBadge);
+        });
+
+        techStackSection.appendChild(techBadges);
+        projectCard.appendChild(techStackSection);
+    }
+
+    // Key metrics
+    if (project.keyMetrics && project.keyMetrics.length > 0) {
+        const metricsSection = document.createElement('div');
+        metricsSection.className = 'project-metrics';
+
+        const metricsTitle = document.createElement('div');
+        metricsTitle.className = 'project-metrics-title';
+        metricsTitle.textContent = 'Key Results';
+        metricsSection.appendChild(metricsTitle);
+
+        const metricsList = document.createElement('ul');
+        metricsList.className = 'project-metrics-list';
+
+        project.keyMetrics.forEach(metric => {
+            const metricItem = document.createElement('li');
+            metricItem.textContent = metric;
+            metricsList.appendChild(metricItem);
+        });
+
+        metricsSection.appendChild(metricsList);
+        projectCard.appendChild(metricsSection);
+    }
+
+    return projectCard;
+}
+
+function createMetaItem(label, value) {
+    const metaItem = document.createElement('div');
+    metaItem.className = 'project-meta-item';
+
+    const labelElement = document.createElement('strong');
+    labelElement.textContent = `${label}:`;
+    
+    const valueElement = document.createElement('span');
+    valueElement.textContent = value;
+
+    metaItem.appendChild(labelElement);
+    metaItem.appendChild(valueElement);
+
+    return metaItem;
 }
 
 function populateContactForm(contactConfig) {
@@ -511,6 +862,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         populateAbout(configData.about);
         populateProfile(configData.profile);
         populateServices(configData.services, configData.servicesSection);
+        // Store services data globally for resize handler
+        window.servicesData = configData.services;
         populateGitHub(configData.github);
         populateContactForm(configData.contact);
         populateFooter(configData.footer);
@@ -636,4 +989,48 @@ document.addEventListener('DOMContentLoaded', async function() {
             observer.observe(el);
         });
     }, 100);
+    
+    // Handle window resize for services layout
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            handleResponsiveLayout();
+        }, 250);
+    });
 });
+
+function handleResponsiveLayout() {
+    const isMobile = window.innerWidth <= 768;
+    const serviceCards = document.querySelectorAll('.service-card');
+    const projectsPanel = document.getElementById('projects-panel');
+    
+    if (activeServiceIndex !== null && serviceCards[activeServiceIndex]) {
+        const activeCard = serviceCards[activeServiceIndex];
+        
+        if (isMobile) {
+            // Remove desktop panel content and add mobile panel if not present
+            const existingMobilePanel = activeCard.nextElementSibling;
+            if (!existingMobilePanel || !existingMobilePanel.classList.contains('projects-panel')) {
+                // Get service data from global storage
+                const services = window.servicesData;
+                if (services && services[activeServiceIndex]) {
+                    const mobilePanelHtml = createMobileProjectsPanel(services[activeServiceIndex]);
+                    activeCard.insertAdjacentHTML('afterend', mobilePanelHtml);
+                }
+            }
+            showNoSelectionMessage(); // Clear desktop panel
+        } else {
+            // Remove mobile panel if present and update desktop panel
+            const mobilePanel = activeCard.nextElementSibling;
+            if (mobilePanel && mobilePanel.classList.contains('projects-panel')) {
+                mobilePanel.remove();
+            }
+            // Re-render desktop panel
+            const services = window.servicesData;
+            if (services && services[activeServiceIndex]) {
+                renderProjectsPanel(services[activeServiceIndex]);
+            }
+        }
+    }
+}

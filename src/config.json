@@ -30,32 +30,169 @@
   "profile": {
     "title": "I'm Dave",
     "name": "David LeBlanc",
-    "role": "BI Consultant @ Ironside",
+    "role": "Consultant @ Ironside",
     "headshot": "assets/images/Headshot.jpeg",
     "bio": "With over a decade of experience in technology and business intelligence, I specialize in transforming complex data into actionable insights. I'm passionate about helping businesses make data-driven decisions and building scalable solutions that drive growth.",
-    "linkedin": "https://linkedin.com/in/davidleblanc",
-    "email": "david@blancpagesolutions.com"
+    "linkedin": "https://linkedin.com/in/davidleblanc-",
+    "email": "dave@blancpagesolutions.com"
   },
   "services": [
     {
       "title": "Business Intelligence",
       "description": "I design and implement BI solutions that transform raw data into strategic insights for better decision making",
-      "icon": "business-intelligence"
+      "icon": "chart-bar",
+      "iconType": "fontawesome",
+      "tools": ["powerbi", "tableau", "quicksight", "looker"],
+      "projects": [
+        {
+          "title": "Healthcare Analytics Dashboard",
+          "industry": "Healthcare",
+          "timeframe": "8 months",
+          "completionDate": "September 2024",
+          "businessContext": "Regional hospital system needed real-time visibility into patient flow, bed utilization, and operational metrics to improve efficiency and patient care",
+          "outcome": "Reduced patient wait times by 30%, improved bed utilization by 15%, and provided executives with real-time operational dashboards",
+          "techStack": [
+            {"tool": "powerbi", "alt": "Microsoft Power BI"},
+            {"tool": "azure", "alt": "Microsoft Azure"},
+            {"tool": "sql", "alt": "SQL Server Database"}
+          ],
+          "keyMetrics": ["30% reduction in wait times", "15% improved bed utilization", "Real-time reporting"]
+        },
+        {
+          "title": "Financial Services KPI Platform",
+          "industry": "Financial Services",
+          "timeframe": "6 months", 
+          "completionDate": "March 2024",
+          "businessContext": "Credit union required comprehensive executive dashboards to track loan performance, member growth, and regulatory compliance metrics",
+          "outcome": "Automated monthly reporting process, reduced report generation time by 80%, and improved regulatory compliance tracking",
+          "isPersonal": true,
+          "techStack": [
+            {"tool": "tableau", "alt": "Tableau"},
+            {"tool": "snowflake", "alt": "Snowflake Data Cloud"},
+            {"tool": "python", "alt": "Python"}
+          ],
+          "keyMetrics": ["80% faster reporting", "100% automated compliance", "Executive visibility"]
+        }
+      ]
     },
     {
       "title": "Data Engineering",
       "description": "I build robust data pipelines and architectures that ensure your data is clean, accessible, and scalable",
-      "icon": "data-engineering"
+      "icon": "database",
+      "iconType": "fontawesome", 
+      "tools": ["python", "spark", "aws", "snowflake"],
+      "projects": [
+        {
+          "title": "Real-time Data Pipeline Architecture",
+          "industry": "E-commerce",
+          "timeframe": "10 months",
+          "completionDate": "July 2024",
+          "businessContext": "Growing e-commerce platform needed to process millions of daily transactions and customer interactions for real-time personalization",
+          "outcome": "Built scalable data pipeline processing 2M+ events daily with 99.9% uptime, enabling real-time product recommendations",
+          "techStack": [
+            {"tool": "aws", "alt": "Amazon Web Services"},
+            {"tool": "python", "alt": "Python"},
+            {"tool": "spark", "alt": "Apache Spark"},
+            {"tool": "kafka", "alt": "Apache Kafka"}
+          ],
+          "keyMetrics": ["2M+ daily events processed", "99.9% uptime", "Real-time recommendations"]
+        },
+        {
+          "title": "Legacy Data Migration & Modernization",
+          "industry": "Manufacturing",
+          "timeframe": "12 months",
+          "completionDate": "December 2023",
+          "businessContext": "Manufacturing company needed to migrate 20+ years of legacy data to cloud platform while maintaining operations",
+          "outcome": "Successfully migrated 50TB of historical data with zero downtime, improved query performance by 75%",
+          "isPersonal": true,
+          "techStack": [
+            {"tool": "snowflake", "alt": "Snowflake Data Cloud"},
+            {"tool": "aws", "alt": "Amazon Web Services"},
+            {"tool": "python", "alt": "Python"},
+            {"tool": "airflow", "alt": "Apache Airflow"}
+          ],
+          "keyMetrics": ["50TB data migrated", "Zero downtime", "75% faster queries"]
+        }
+      ]
     },
     {
       "title": "Solution Architecture",
       "description": "I design comprehensive technical solutions that align with your business goals and scale with your growth",
-      "icon": "solution-architecture"
+      "icon": "sitemap",
+      "iconType": "fontawesome",
+      "tools": ["aws", "azure", "kubernetes", "terraform"],
+      "projects": [
+        {
+          "title": "Multi-Cloud Infrastructure Design",
+          "industry": "Technology Startup",
+          "timeframe": "5 months",
+          "completionDate": "June 2024",
+          "businessContext": "Fast-growing SaaS startup needed scalable, resilient infrastructure to support 10x user growth while maintaining security compliance",
+          "outcome": "Designed auto-scaling architecture supporting 500K+ users, achieved 99.95% uptime with 50% cost optimization",
+          "techStack": [
+            {"tool": "aws", "alt": "Amazon Web Services"},
+            {"tool": "terraform", "alt": "Terraform"},
+            {"tool": "kubernetes", "alt": "Kubernetes"},
+            {"tool": "docker", "alt": "Docker"}
+          ],
+          "keyMetrics": ["500K+ users supported", "99.95% uptime", "50% cost reduction"]
+        },
+        {
+          "title": "Enterprise Security & Compliance Framework",
+          "industry": "Government",
+          "timeframe": "8 months",
+          "completionDate": "November 2024",
+          "businessContext": "Government agency required secure cloud architecture meeting FedRAMP compliance standards for citizen services platform",
+          "outcome": "Delivered FedRAMP-compliant infrastructure with automated security monitoring and incident response capabilities",
+          "techStack": [
+            {"tool": "azure", "alt": "Microsoft Azure"},
+            {"tool": "terraform", "alt": "Terraform"},
+            {"tool": "sentinel", "alt": "Microsoft Sentinel"},
+            {"tool": "keyvault", "alt": "Azure Key Vault"}
+          ],
+          "keyMetrics": ["FedRAMP compliant", "Automated security", "Zero security incidents"]
+        }
+      ]
     },
     {
       "title": "Full Stack Development",
       "description": "I develop end-to-end applications from database to user interface, delivering complete technical solutions",
-      "icon": "full-stack-development"
+      "icon": "code",
+      "iconType": "fontawesome",
+      "tools": ["react", "nodejs", "python", "postgresql"],
+      "projects": [
+        {
+          "title": "Customer Portal Application",
+          "industry": "Professional Services",
+          "timeframe": "7 months",
+          "completionDate": "August 2024",
+          "businessContext": "Consulting firm needed client-facing portal for project tracking, document sharing, and billing transparency",
+          "outcome": "Increased client satisfaction scores by 40%, reduced support tickets by 60%, streamlined project communication",
+          "isPersonal": true,
+          "techStack": [
+            {"tool": "react", "alt": "React"},
+            {"tool": "nodejs", "alt": "Node.js"},
+            {"tool": "postgresql", "alt": "PostgreSQL"},
+            {"tool": "aws", "alt": "Amazon Web Services"}
+          ],
+          "keyMetrics": ["40% higher satisfaction", "60% fewer support tickets", "Streamlined communication"]
+        },
+        {
+          "title": "Internal Operations Platform",
+          "industry": "Retail",
+          "timeframe": "9 months",
+          "completionDate": "February 2024",
+          "businessContext": "Regional retailer needed unified platform for inventory management, sales tracking, and employee scheduling across 25 locations",
+          "outcome": "Reduced inventory discrepancies by 85%, improved scheduling efficiency by 45%, unified operations across all locations",
+          "techStack": [
+            {"tool": "react", "alt": "React"},
+            {"tool": "python", "alt": "Python"},
+            {"tool": "postgresql", "alt": "PostgreSQL"},
+            {"tool": "redis", "alt": "Redis"}
+          ],
+          "keyMetrics": ["85% fewer inventory errors", "45% scheduling efficiency", "25 locations unified"]
+        }
+      ]
     }
   ],
   "servicesSection": {
@@ -81,10 +218,10 @@
     "successMessage": "Thank you for your message! I'll get back to you soon."
   },
   "footer": {
-    "copyrightText": "© 2024 BlancPage Solutions. All rights reserved.",
+    "copyrightText": "© 2025 BlancPage Solutions. All rights reserved.",
     "socialLinks": [
-      {"platform": "linkedin", "url": "https://linkedin.com/company/blancpagesolutions"},
-      {"platform": "twitter", "url": "https://twitter.com/blancpagesolutions"},
+      {"platform": "linkedin", "url": "https://www.linkedin.com/in/daveleblanc-/"},
+      {"platform": "github", "url": "https://github.com/dmleblanc"},
       {"platform": "facebook", "url": "https://facebook.com/blancpagesolutions"}
     ]
   },

@@ -613,38 +613,401 @@ h2 {
     line-height: 1.7;
 }
 
-.services-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+/* Services Layout */
+.services-layout {
+    display: flex;
     gap: 2rem;
     margin-top: 3rem;
+    min-height: 500px;
+}
+
+.services-column {
+    flex: 0 0 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.projects-panel {
+    flex: 1;
+    background-color: var(--background-primary);
+    border-radius: 10px;
+    padding: 2rem;
+    position: sticky;
+    top: 100px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    border: 1px solid var(--border-light);
+}
+
+.projects-panel-content {
+    height: 100%;
+}
+
+.no-selection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 300px;
+    color: var(--text-light);
+    font-style: italic;
+    text-align: center;
 }
 
 .service-card {
     background-color: var(--background-secondary);
-    padding: 2rem;
+    padding: 1.5rem;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    border: 1px solid var(--border-light);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
 }
 
-.service-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+/* Folded corner effect - blank page design */
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 25px 25px 0;
+    border-color: transparent var(--background-primary) transparent transparent;
+    z-index: 2;
+}
+
+.service-card::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    right: 1px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 24px 24px 0;
+    border-color: transparent #f0f0f0 transparent transparent;
+    z-index: 1;
+    box-shadow: -2px 2px 3px rgba(0,0,0,0.1);
+    filter: brightness(0.95);
+}
+
+.service-card.active {
+    border-color: var(--primary-color);
+    background-color: var(--background-secondary);
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(230, 39, 39, 0.15);
+}
+
+/* Arrow indicator for active card - renamed to avoid conflict with folded corner */
+.service-card.active::before {
+    /* Reset the folded corner for active state */
+    border-width: 0 25px 25px 0;
+    border-color: transparent var(--background-primary) transparent transparent;
+}
+
+/* Create arrow with a different selector */
+.service-card.active > .arrow-indicator {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 0 10px 10px;
+    border-color: transparent transparent transparent var(--primary-color);
+    z-index: 3;
+}
+
+.service-card:hover:not(.active) {
+    transform: translateX(3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
 }
 
 .service-card h3 {
     font-family: var(--font-heading);
     font-weight: var(--font-heading-weight);
     color: var(--primary-color);
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.2rem;
 }
 
 .service-card p {
     color: var(--text-dark);
     opacity: 0.85;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Service Icons */
+.service-icon {
+    margin-bottom: 1.5rem;
+}
+
+.service-icon i {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.service-card:hover .service-icon i {
+    transform: scale(1.1);
+    color: var(--primary-dark);
+}
+
+/* Tool Badges */
+.tool-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.tool-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--background-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    border: 1px solid var(--border-light);
+}
+
+.tool-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    border-color: var(--primary-color);
+}
+
+.tool-badge img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.tool-fallback {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+}
+
+/* Projects Panel */
+.projects-panel-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-light);
+}
+
+.projects-panel-title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0 0 0.5rem 0;
+}
+
+.projects-panel-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+.projects-container {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.project-card {
+    background-color: var(--background-primary);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: box-shadow 0.2s ease;
+    position: relative;
+}
+
+.project-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.project-card:last-child {
+    margin-bottom: 0;
+}
+
+.personal-project-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.project-header {
+    margin-bottom: 1rem;
+}
+
+.project-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0 0 0.5rem 0;
+}
+
+.project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.project-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.project-meta-item strong {
+    color: var(--text-dark);
+}
+
+.project-description {
+    margin-bottom: 1rem;
+}
+
+.project-context, .project-outcome {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: var(--text-dark);
+}
+
+.project-context {
+    font-style: italic;
+    border-left: 3px solid var(--primary-color);
+    padding-left: 1rem;
+    background-color: rgba(230, 39, 39, 0.02);
+    padding: 0.75rem 0 0.75rem 1rem;
+    border-radius: 0 4px 4px 0;
+}
+
+.project-outcome {
+    background-color: rgba(30, 147, 171, 0.05);
+    padding: 0.75rem;
+    border-radius: 4px;
+    border-left: 3px solid var(--secondary-color);
+}
+
+.project-tech-stack {
+    margin-top: 1rem;
+}
+
+.project-tech-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.project-tech-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.project-tech-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background-color: var(--background-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    border: 1px solid var(--border-light);
+}
+
+.project-tech-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.project-tech-badge img {
+    width: 20px;
+    height: 20px;
+    filter: grayscale(10%);
+    transition: filter 0.2s ease;
+}
+
+.project-tech-badge:hover img {
+    filter: grayscale(0%);
+}
+
+.project-metrics {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.project-metrics-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.project-metrics-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.project-metrics-list li {
+    background-color: var(--background-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    border: 1px solid var(--border-light);
 }
 
 .contact {
@@ -720,5 +1083,119 @@ footer {
 
     .hero p {
         font-size: 1rem;
+    }
+
+    /* Mobile service icons and badges */
+    .service-icon i {
+        font-size: 2.5rem;
+    }
+
+    .service-card {
+        padding: 1.5rem;
+    }
+
+    .tool-badges {
+        gap: 0.5rem;
+    }
+
+    .tool-badge {
+        width: 35px;
+        height: 35px;
+    }
+
+    .tool-badge img {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Mobile Projects Styles */
+    .project-card {
+        padding: 1rem;
+    }
+
+    .project-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .project-tech-badges {
+        gap: 0.375rem;
+    }
+
+    .project-tech-badge {
+        width: 28px;
+        height: 28px;
+    }
+
+    .project-tech-badge img {
+        width: 18px;
+        height: 18px;
+    }
+
+    .project-metrics-list {
+        gap: 0.5rem;
+    }
+
+    .project-metrics-list li {
+        font-size: 0.8rem;
+    }
+
+    /* Services Layout Mobile */
+    .services-layout {
+        flex-direction: column;
+    }
+
+    .services-column {
+        flex: 1 1 100%;
+    }
+
+    .projects-panel {
+        display: none;
+        position: static;
+        max-height: none;
+        margin-top: 1rem;
+        padding: 1.5rem;
+    }
+
+    .projects-panel.mobile-visible {
+        display: block;
+        animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            max-height: 0;
+        }
+        to {
+            opacity: 1;
+            max-height: 2000px;
+        }
+    }
+
+    .service-card.active::after {
+        display: none;
+    }
+
+    .service-card.active {
+        transform: none;
+        margin-bottom: 0;
+    }
+
+    .service-card {
+        margin-bottom: 1rem;
+    }
+    
+    /* Smaller folded corner on mobile */
+    .service-card::before {
+        border-width: 0 20px 20px 0;
+    }
+    
+    .service-card::after {
+        border-width: 0 19px 19px 0;
+    }
+
+    .no-selection {
+        display: none;
     }
 }

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#00758F">
+  <rect x="3" y="8" width="18" height="8" rx="1" fill="none" stroke="#00758F" stroke-width="1.5"/>
+  <rect x="3" y="12" width="18" height="4" rx="1" fill="#00758F" opacity="0.3"/>
+  <circle cx="6" cy="10" r="0.5"/>
+  <circle cx="8" cy="10" r="0.5"/>
+  <circle cx="10" cy="10" r="0.5"/>
+  <text x="12" y="11" font-size="6" fill="#00758F" font-family="monospace">SQL</text>
+</svg>
